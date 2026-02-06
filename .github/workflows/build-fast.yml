@@ -1,0 +1,43 @@
+name: Build Fast (Debug x64)
+
+on:
+  push:
+    branches: [ "dev/shift-scroll" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      Configuration: Debug
+      Platform: x64
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Install .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        global-json-file: global.json
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: SHA
+      id: sha
+      run: echo "sha=$("${{ github.sha }}".SubString(0, 7))" >> $env:GITHUB_OUTPUT
+
+    - name: Build
+      run: |
+        $sha = "${{ steps.sha.outputs.sha }}"
+        New-Item -Path "build/Starward/" -Type Directory
+        msbuild src/Starward.Launcher "-property:Configuration=$env:Configuration;Platform=$env:Platform;OutDir=$(Resolve-Path "build/Starward/")"
+        dotnet publish src/Starward -c $env:Configuration -r "win-$env:Platform" -o "build/Starward/app-build.$sha" -p:Platform=$env:Platform -p:Version="0.0.1-build.$sha" -p:DefineConstants=CI
+        Add-Content "build/Starward/version.ini" -Value "app_folder=app-build.$sha`r`nexe_name=Starward.exe"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v5
+      with:
+        name: Starward_Debug_x64_${{ steps.sha.outputs.sha }}
+        path: build/Starward/
