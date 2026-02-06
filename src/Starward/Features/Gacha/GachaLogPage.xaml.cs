@@ -109,7 +109,7 @@ public sealed partial class GachaLogPage : PageBase
                 _ = UpdateGachaLogInternalAsync(m.Url);
             }
         });
-        ScrollViewer_GachaStats.PointerWheelChanged += ScrollViewer_GachaStats_PointerWheelChanged;
+        ScrollViewer_GachaStats.AddHandler(UIElement.PointerWheelChangedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler(ScrollViewer_GachaStats_PointerWheelChanged), true);
         Initialize();
         await UpdateWikiDataAsync();
     }
@@ -119,7 +119,7 @@ public sealed partial class GachaLogPage : PageBase
     protected override void OnUnloaded()
     {
         WeakReferenceMessenger.Default.UnregisterAll(this);
-        ScrollViewer_GachaStats.PointerWheelChanged -= ScrollViewer_GachaStats_PointerWheelChanged;
+        ScrollViewer_GachaStats.RemoveHandler(UIElement.PointerWheelChangedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler(ScrollViewer_GachaStats_PointerWheelChanged));
         if (DisplayGachaTypeStatsCollection is not null)
         {
             DisplayGachaTypeStatsCollection.Clear();
