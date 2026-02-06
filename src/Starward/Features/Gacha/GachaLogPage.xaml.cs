@@ -109,7 +109,7 @@ public sealed partial class GachaLogPage : PageBase
                 _ = UpdateGachaLogInternalAsync(m.Url);
             }
         });
-        ScrollViewer_GachaStats.AddHandler(UIElement.PointerWheelChangedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler(ScrollViewer_GachaStats_PointerWheelChanged), true);
+        Grid_GachaStats.PointerWheelChanged += Grid_GachaStats_PointerWheelChanged;
         Initialize();
         await UpdateWikiDataAsync();
     }
@@ -119,7 +119,7 @@ public sealed partial class GachaLogPage : PageBase
     protected override void OnUnloaded()
     {
         WeakReferenceMessenger.Default.UnregisterAll(this);
-        ScrollViewer_GachaStats.RemoveHandler(UIElement.PointerWheelChangedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler(ScrollViewer_GachaStats_PointerWheelChanged));
+        Grid_GachaStats.PointerWheelChanged -= Grid_GachaStats_PointerWheelChanged;
         if (DisplayGachaTypeStatsCollection is not null)
         {
             DisplayGachaTypeStatsCollection.Clear();
@@ -169,9 +169,9 @@ public sealed partial class GachaLogPage : PageBase
 
 
 
-    private void ScrollViewer_GachaStats_PointerWheelChanged(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void Grid_GachaStats_PointerWheelChanged(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        var properties = e.GetCurrentPoint(ScrollViewer_GachaStats).Properties;
+        var properties = e.GetCurrentPoint(Grid_GachaStats).Properties;
         if (properties.IsHorizontalMouseWheel || InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift).HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down))
         {
             var delta = properties.MouseWheelDelta;
